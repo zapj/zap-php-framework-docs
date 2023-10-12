@@ -1,0 +1,15 @@
+{
+  "name": "zap-framework-php-docs",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "https://github.com/zapj/zap-php-framework-php-docs",
+  "author": "zap <z@zap.cn>",
+  "license": "MIT",
+  "devDependencies": {
+    "vuepress": "^2.0.0-beta.67"
+  },
+  "scripts": {
+    "docs:dev": "vuepress dev docs",
+    "docs:build": "vuepress build docs"
+  }
+}
