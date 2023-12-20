@@ -7,8 +7,6 @@ composer require zapj/zap-php-framework
 
 ## 目录文件
 
-### 目录
-
 ```
 ├─ app
 │  ├─ zap
@@ -25,7 +23,7 @@ composer require zapj/zap-php-framework
 └─ composer.json
 ```
 
-### Console
+## Console
 
 ```
 php bin/console DB@create

@@ -5,6 +5,7 @@ export default defineUserConfig({
   lang: 'zh-CN',
   title: 'Zap PHP Framework Docs',
   description: '开发文档',
+  base: '/docs/zap-framework/',
   theme: defaultTheme({
     docsDir: 'docs',
     locales:{
@@ -16,6 +17,7 @@ export default defineUserConfig({
                 children: [
                   '/guide/README.md',
                   '/guide/getting-started.md',
+                  '/guide/config.md',
                 ],
               },
               {

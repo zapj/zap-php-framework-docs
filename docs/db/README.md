@@ -31,7 +31,7 @@ return [
        'sqlite'=>[
            'driver' => 'sqlite',
            'prefix' => 'zap_',
-           'dsn'=> sprintf('sqlite:%s', resource_path('zap.db'))
+           'dsn'=> sprintf('sqlite:%s', var_path('data/zapcms.db'))
        ]
     ],
 
