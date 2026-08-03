@@ -61,6 +61,7 @@ export default defineUserConfig({
           text: '工具集',
           collapsible: false,
           children: [
+            { text: 'HTML 构建器', link: '/guide/html-builder' },
             { text: '图像处理', link: '/guide/images' },
             { text: '验证', link: '/guide/validation' },
             { text: '辅助函数', link: '/guide/helpers' },
@@ -107,6 +108,7 @@ export default defineUserConfig({
           collapsible: false,
           children: [
             { text: 'View', link: '/api/view' },
+            { text: 'Html & Element', link: '/api/html' },
             { text: 'PHPRenderer', link: '/api/php-renderer' },
             { text: 'TwigViewRenderer', link: '/api/twig-renderer' },
           ],
