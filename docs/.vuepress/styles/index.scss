@@ -1,0 +1,173 @@
+/* ===== 主页样式 ===== */
+.home .hero {
+  text-align: center;
+  padding: 4rem 0 3rem;
+}
+.home .hero img {
+  max-width: 120px;
+}
+.home .hero h1 {
+  font-size: 3rem;
+  font-weight: 800;
+  background: linear-gradient(135deg, #6366f1, #8b5cf6, #ec4899);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.home .hero .description {
+  font-size: 1.35rem;
+  color: var(--c-text-light);
+  max-width: 560px;
+  margin: 0 auto;
+}
+
+/* ===== 文档内容 ===== */
+.theme-default-content {
+  max-width: var(--content-width) !important;
+}
+.theme-default-content h1 {
+  font-size: 2.25rem;
+  font-weight: 800;
+  margin-bottom: 1rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid var(--c-border);
+}
+.theme-default-content h2 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin-top: 2.5rem;
+  padding-bottom: 0.3rem;
+  border-bottom: 1px solid var(--c-border-dark);
+}
+.theme-default-content h3 {
+  font-size: 1.2rem;
+  font-weight: 600;
+  margin-top: 2rem;
+}
+.theme-default-content code {
+  background: var(--c-bg-light);
+  border-radius: 4px;
+  padding: 0.15em 0.4em;
+  font-size: 0.9em;
+  color: #ec4899;
+}
+html.dark .theme-default-content code {
+  color: #f472b6;
+}
+
+/* ===== 侧边栏 ===== */
+.sidebar {
+  background: var(--c-bg-light);
+}
+.sidebar-heading {
+  font-weight: 700 !important;
+  font-size: 0.75rem !important;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--c-text-lighter) !important;
+  padding: 1.25rem 1.5rem 0.5rem !important;
+}
+.sidebar-item {
+  padding: 0.25rem 1.5rem !important;
+}
+.sidebar-item.active {
+  color: var(--c-brand) !important;
+  font-weight: 600;
+  border-left: 3px solid var(--c-brand);
+  padding-left: calc(1.5rem - 3px) !important;
+}
+
+/* ===== 自定义容器 ===== */
+.custom-container {
+  border-radius: 8px;
+  margin: 1.5rem 0;
+  padding: 1rem 1.25rem;
+}
+.custom-container.tip {
+  border-left: 4px solid var(--c-tip);
+  background: var(--c-tip-bg);
+}
+.custom-container.warning {
+  border-left: 4px solid var(--c-warning);
+  background: var(--c-warning-bg);
+}
+.custom-container.danger {
+  border-left: 4px solid var(--c-danger);
+  background: var(--c-danger-bg);
+}
+
+/* ===== 表格 ===== */
+.theme-default-content table {
+  display: table;
+  width: 100%;
+}
+.theme-default-content thead th {
+  background: var(--c-bg-light);
+  font-weight: 600;
+}
+.theme-default-content tr:nth-child(2n) {
+  background: var(--c-bg-lighter);
+}
+
+/* ===== 代码块 ===== */
+div[class*="language-"] {
+  border-radius: 8px;
+  margin: 1.5rem 0;
+}
+div[class*="language-"]::before {
+  display: none;
+}
+
+/* ===== API 文档 ===== */
+.api-method {
+  margin: 1.5rem 0;
+  padding: 1rem 1.25rem;
+  border: 1px solid var(--c-border);
+  border-radius: 8px;
+}
+.api-method .signature {
+  font-family: 'SF Mono', 'Fira Code', monospace;
+  font-size: 0.95rem;
+  color: var(--c-text);
+  margin-bottom: 0.5rem;
+}
+.api-method .return-type {
+  display: inline-block;
+  background: var(--c-tip-bg);
+  color: var(--c-tip-title);
+  font-size: 0.8rem;
+  padding: 0.1em 0.5em;
+  border-radius: 4px;
+  margin-right: 0.5rem;
+}
+.api-method .param-name {
+  color: var(--c-brand);
+  font-weight: 600;
+}
+.api-tag {
+  display: inline-block;
+  font-size: 0.75rem;
+  padding: 0.1em 0.6em;
+  border-radius: 4px;
+  margin-right: 0.4rem;
+  font-weight: 600;
+}
+.api-tag.static { background: #dbeafe; color: #1e40af; }
+.api-tag.public { background: #dcfce7; color: #166534; }
+.api-tag.protected { background: #fef3c7; color: #92400e; }
+html.dark .api-tag.static { background: #1e3a5f; color: #93c5fd; }
+html.dark .api-tag.public { background: #14532d; color: #86efac; }
+html.dark .api-tag.protected { background: #78350f; color: #fcd34d; }
+
+/* ===== 页面导航 ===== */
+.page-nav {
+  max-width: var(--content-width) !important;
+}
+.page-meta {
+  max-width: var(--content-width) !important;
+}
+
+/* ===== 响应式 ===== */
+@media (max-width: 719px) {
+  .home .hero h1 { font-size: 2rem; }
+}

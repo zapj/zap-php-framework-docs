@@ -1,0 +1,39 @@
+/* ===== 颜色变量 ===== */
+:root {
+  --c-brand: #6366f1;
+  --c-brand-light: #818cf8;
+  --c-brand-lighter: #a5b4fc;
+  --c-brand-dark: #4f46e5;
+  --c-brand-darker: #4338ca;
+
+  --c-tip: #6366f1;
+  --c-tip-bg: #eef2ff;
+  --c-tip-title: #4338ca;
+  --c-tip-text: #312e81;
+
+  --c-warning: #f59e0b;
+  --c-warning-bg: #fffbeb;
+  --c-warning-title: #b45309;
+
+  --c-danger: #ef4444;
+  --c-danger-bg: #fef2f2;
+  --c-danger-title: #b91c1c;
+
+  --content-width: 900px;
+  --sidebar-width: 16rem;
+}
+
+html.dark {
+  --c-brand: #818cf8;
+  --c-brand-light: #a5b4fc;
+  --c-bg: #0f172a;
+  --c-bg-light: #1e293b;
+  --c-bg-lighter: #334155;
+
+  --c-tip-bg: #1e1b4b;
+  --c-tip-title: #a5b4fc;
+  --c-tip-text: #c7d2fe;
+
+  --c-warning-bg: #451a03;
+  --c-danger-bg: #450a0a;
+}
