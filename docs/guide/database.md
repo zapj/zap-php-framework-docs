@@ -20,20 +20,24 @@ $readConnection = DB::connection('slave');
 // 获取表查询构建器
 $query = DB::table('users');
 
-// 执行原始 SQL 查询
+// CRUD 便捷方法（表名+数据，自动参数化绑定）
+$id = DB::insert('users', ['name' => '张三', 'email' => 'zhang@example.com']);
+DB::update('users', ['status' => 'inactive'], ['id' => 5]);
+DB::delete('users', ['id' => 5]);
+
+// 批量插入 / Upsert / Replace
+DB::batchInsert('users', [['name' => 'A'], ['name' => 'B']]);
+DB::upsert('users', ['id' => 1, 'name' => '更新']);
+DB::replace('users', ['id' => 1, 'name' => '替换']);
+
+// 计数和键值对
+$total = DB::count('users', 'status = ?', [1]);
+$map = DB::keyPair('users', 'id, name'); // → [1=>'张三', 2=>'李四']
+
+// 原始 SQL 执行
 $results = DB::select('SELECT * FROM users WHERE status = ?', ['active']);
-
-// 执行 INSERT
-$affected = DB::insert('INSERT INTO users (name, email) VALUES (?, ?)', ['张三', 'zhang@example.com']);
-
-// 执行 UPDATE
-$affected = DB::update('UPDATE users SET status = ? WHERE id = ?', ['inactive', 5]);
-
-// 执行 DELETE
-$affected = DB::delete('DELETE FROM users WHERE id = ?', [5]);
-
-// 执行任意语句
-DB::statement('TRUNCATE TABLE logs');
+DB::exec('UPDATE users SET status=? WHERE id=?', ['inactive', 5]);
+$id = DB::execInsert('INSERT INTO logs (msg) VALUES (?)', ['start']);
 ```
 
 ## 查询构建器
@@ -294,14 +298,12 @@ $user->update(1, ['name' => '已更新']);
 DB::beginTransaction();
 
 try {
-    DB::table('users')->insert([
+    $userId = DB::insert('users', [
         'name'  => '张三',
         'email' => 'zhang@example.com',
     ]);
 
-    $userId = DB::table('users')->lastInsertId();
-
-    DB::table('profiles')->insert([
+    DB::insert('profiles', [
         'user_id' => $userId,
         'bio'     => '个人简介',
     ]);
@@ -319,15 +321,13 @@ try {
 
 ```php
 DB::transaction(function() {
-    DB::table('orders')->insert([
+    $orderId = DB::insert('orders', [
         'user_id'    => 1,
         'total'      => 99.99,
         'created_at' => date('Y-m-d H:i:s'),
     ]);
 
-    $orderId = DB::table('orders')->lastInsertId();
-
-    DB::table('order_items')->insert([
+    DB::insert('order_items', [
         'order_id'   => $orderId,
         'product_id' => 5,
         'quantity'   => 2,
@@ -335,18 +335,16 @@ DB::transaction(function() {
     ]);
 
     // 更新库存
-    DB::table('products')->where('id', 5)->decrement('stock', 2);
+    DB::update('products', ['stock' => new \zap\db\Expression('stock - 2')], ['id' => 5]);
 });
 
 // 带返回值的事务
 $orderId = DB::transaction(function() {
-    DB::table('orders')->insert([
+    return DB::insert('orders', [
         'user_id'    => 1,
         'total'      => 150.00,
         'created_at' => date('Y-m-d H:i:s'),
     ]);
-
-    return DB::table('orders')->lastInsertId();
 });
 ```
 
@@ -359,12 +357,12 @@ DB::beginTransaction();
 
 try {
     // 外层操作
-    DB::table('users')->insert(['name' => 'Parent User']);
+    DB::insert('users', ['name' => 'Parent User']);
 
     // 内层事务（使用保存点）
     DB::beginTransaction();
     try {
-        DB::table('profiles')->insert(['user_id' => 1, 'bio' => 'Inner']);
+        DB::insert('profiles', ['user_id' => 1, 'bio' => 'Inner']);
         DB::commit(); // 释放保存点
     } catch (\Exception $e) {
         DB::rollBack(); // 回滚到保存点
@@ -503,7 +501,7 @@ class UserController extends Controller
         // 写入使用主库（默认连接）
         $data = $this->request()->json();
 
-        $id = DB::table('users')->insert([
+        $id = DB::insert('users', [
             'name'       => $data['name'],
             'email'      => $data['email'],
             'created_at' => date('Y-m-d H:i:s'),
@@ -594,7 +592,7 @@ class ProductController extends Controller
 
         $id = DB::transaction(function() use ($data) {
             // 插入商品
-            $id = DB::table('products')->insert([
+            $id = DB::insert('products', [
                 'name'        => $data['name'],
                 'category_id' => $data['category_id'],
                 'price'       => $data['price'],
@@ -605,7 +603,7 @@ class ProductController extends Controller
             ]);
 
             // 记录操作日志
-            DB::table('operation_logs')->insert([
+            DB::insert('operation_logs', [
                 'action'     => 'product.create',
                 'target_id'  => $id,
                 'created_at' => date('Y-m-d H:i:s'),
