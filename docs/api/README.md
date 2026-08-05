@@ -13,6 +13,7 @@
 | `zap\db` | [ZPDO](/api/zpdo) · [Query](/api/query) · [Model](/api/model) |
 | `zap\util` | [Arr & Str](/api/arr-str) · [Date & UUID](/api/date-uuid) · [Password & Random](/api/password-random) |
 | `zap\image` | [Image](/api/image) |
+| `zap\fileupload` | [FileUpload](/api/file-upload) · [UploadedFile](/api/file-upload#uploadedfile) · [FileUploadException](/api/file-upload#fileuploadexception) |
 | `zap\facades` | [Facades](/api/facades) |
 | `zap\exception` | [Exceptions](/api/exceptions) |
 
@@ -22,4 +23,5 @@
 - 想找数据库操作？→ [DB](/api/db) · [ZPDO](/api/zpdo) · [Query](/api/query)
 - 想找缓存操作？→ [CacheInterface](/api/cache-interface)
 - 想找图像处理？→ [Image](/api/image)
+- 想找文件上传处理？→ [FileUpload](/api/file-upload)
 - 想找 HTTP 请求处理？→ [Request](/api/request) · [Response](/api/response)

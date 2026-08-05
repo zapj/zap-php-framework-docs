@@ -63,6 +63,7 @@ export default defineUserConfig({
           children: [
             { text: 'HTML 构建器', link: '/guide/html-builder' },
             { text: '图像处理', link: '/guide/images' },
+            { text: '文件上传', link: '/guide/file-upload' },
             { text: '验证', link: '/guide/validation' },
             { text: '辅助函数', link: '/guide/helpers' },
             { text: '外观模式', link: '/guide/facades' },
@@ -136,6 +137,7 @@ export default defineUserConfig({
           text: '其他',
           collapsible: false,
           children: [
+            { text: 'FileUpload', link: '/api/file-upload' },
             { text: 'Image', link: '/api/image' },
             { text: 'Log', link: '/api/log' },
             { text: 'Facades', link: '/api/facades' },
