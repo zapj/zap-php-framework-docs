@@ -8,6 +8,7 @@ export default defineUserConfig({
     logo: '/logo.svg',
     logoDark: '/logo.svg',
     repo: '',
+    base: '/',
     docsDir: 'docs',
     docsBranch: 'main',
     editLink: false,
