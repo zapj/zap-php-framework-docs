@@ -3,12 +3,12 @@ import { defaultTheme } from '@vuepress/theme-default'
 import { defineUserConfig } from 'vuepress'
 
 export default defineUserConfig({
+  base: '/',
   bundler: viteBundler(),
   theme: defaultTheme({
     logo: '/logo.svg',
     logoDark: '/logo.svg',
     repo: '',
-    base: '/',
     docsDir: 'docs',
     docsBranch: 'main',
     editLink: false,
