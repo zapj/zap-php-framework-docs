@@ -65,10 +65,11 @@ export default defineUserConfig({
             { text: 'HTML 构建器', link: '/guide/html-builder' },
             { text: '图像处理', link: '/guide/images' },
             { text: '文件上传', link: '/guide/file-upload' },
+            { text: '加密与安全', link: '/guide/crypto' },
             { text: '验证', link: '/guide/validation' },
             { text: '辅助函数', link: '/guide/helpers' },
             { text: '外观模式', link: '/guide/facades' },
-            { text: '安全', link: '/guide/security' },
+            { text: '安全实践', link: '/guide/security' },
           ],
         },
       ],
@@ -131,7 +132,14 @@ export default defineUserConfig({
           children: [
             { text: 'Arr & Str', link: '/api/arr-str' },
             { text: 'Date & UUID', link: '/api/date-uuid' },
-            { text: 'Password & Random', link: '/api/password-random' },
+            { text: 'FileUtils', link: '/api/password-random' },
+          ],
+        },
+        {
+          text: '加密与安全',
+          collapsible: false,
+          children: [
+            { text: 'Crypto 概览', link: '/api/crypto' },
           ],
         },
         {

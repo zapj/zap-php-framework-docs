@@ -85,15 +85,15 @@ Session::set('last_activity', time());
 
 ## 密码安全
 
+使用 `zap\crypto\Hash` 进行安全的密码哈希。优先使用 Argon2id 算法，不可用时自动回退到 bcrypt。详细 API 参考请见 [Crypto](/api/crypto)。
+
 ### 密码哈希
 
-使用 `zap\util\Password` 进行安全的密码哈希（bcrypt 算法）：
-
 ```php
-use zap\util\Password;
+use zap\crypto\Hash;
 
 // 注册时哈希密码
-$hashedPassword = Password::hash($userInputPassword);
+$hashedPassword = Hash::password($userInputPassword);
 
 // 存储到数据库
 DB::table('users')->insert([
@@ -109,7 +109,7 @@ DB::table('users')->insert([
 // 登录时验证密码
 $user = DB::table('users')->where('email', $email)->first();
 
-if (!$user || !Password::verify($password, $user['password'])) {
+if (!$user || !Hash::passwordVerify($password, $user['password'])) {
     // 密码错误
     Log::warning('登录失败', ['email' => $email, 'ip' => req()->ip()]);
     return response()->json(['error' => '邮箱或密码错误'], 401);
@@ -118,13 +118,13 @@ if (!$user || !Password::verify($password, $user['password'])) {
 
 ### 检查是否需要重新哈希
 
-当升级了 bcrypt 的工作因子（cost）时，应检查旧哈希是否需要更新：
+当部署环境升级了哈希算法或调整 cost 时，应检查旧哈希是否需要更新：
 
 ```php
 // 登录成功后检查
-if (Password::needsRehash($user['password'])) {
+if (Hash::passwordNeedsRehash($user['password'])) {
     DB::table('users')->where('id', $user['id'])->update([
-        'password' => Password::hash($password),
+        'password' => Hash::password($password),
     ]);
 }
 ```
@@ -175,16 +175,19 @@ CSRF（Cross-Site Request Forgery，跨站请求伪造）攻击利用用户已�
 ### 实现 CSRF Token
 
 ```php
+use zap\crypto\Random;
+use zap\crypto\Hash;
+
 // 生成 CSRF Token 并存入 Session
 function generateCsrfToken()
 {
     if (!Session::has('csrf_token')) {
-        Session::set('csrf_token', bin2hex(random_bytes(32)));
+        Session::set('csrf_token', Random::hex(64));
     }
     return Session::get('csrf_token');
 }
 
-// 验证 CSRF Token
+// 验证 CSRF Token（constant-time 比较）
 function verifyCsrfToken($token)
 {
     if (!Session::has('csrf_token')) {
@@ -385,9 +388,10 @@ public function upload()
         return $this->json(['error' => '文件大小不能超过 5MB'], 422);
     }
 
-    // 3. 生成安全的文件名
+    // 3. 生成安全的文件名（使用 Random）
+    use zap\crypto\Random;
     $extension = pathinfo($file['name'], PATHINFO_EXTENSION);
-    $filename = bin2hex(random_bytes(16)) . '.' . strtolower($extension);
+    $filename = Random::hex(32) . '.' . strtolower($extension);
 
     // 4. 存储到非公开目录
     $destPath = storage_path('secure_uploads/' . date('Y/m/d') . '/' . $filename);
@@ -528,7 +532,7 @@ try {
 
 - [ ] 生产环境关闭 debug 模式
 - [ ] 使用 HTTPS 加密传输
-- [ ] 密码使用 bcrypt 哈希存储
+- [ ] 密码使用 `Hash::password()`（Argon2id/bcrypt）哈希存储
 - [ ] 登录后重新生成 Session ID
 - [ ] 登出时销毁会话数据
 - [ ] 所有用户输入进行验证和过滤
