@@ -20,7 +20,7 @@ class Router
 
 ### `url(string $name, array $params = []): string`
 
-通过命名路由生成 URL。
+通过命名路由生成 URL。如果配置了 `config('config.suffix')`（如 `.html`），会自动追加后缀。
 
 | 参数 | 类型 | 说明 |
 |------|------|------|
@@ -29,8 +29,13 @@ class Router
 
 ```php
 $url = Router::url('posts.show', ['id' => 42]);
-// → /posts/42
+// → /posts/42       (无 suffix 配置)
+// → /posts/42.html  (配置了 suffix = '.html')
 ```
+
+::: tip URL 后缀
+在 `config/config.php` 中设置 `'suffix' => '.html'`，所有通过 `Router::url()` 和 `UrlHelper` 生成的 URL 会自动追加后缀。根路径 `/`、已有该后缀的 URL、以及绝对路径不会重复追加。详见 [路由指南](/guide/routing.md#url-后缀)。
+:::
 
 ### `setNotFound($handler): void`
 

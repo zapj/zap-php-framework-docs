@@ -311,6 +311,53 @@ print_r($routes);
 // ]
 ```
 
+## URL 后缀
+
+在配置文件中设置 `suffix` 后，所有通过 `Router::url()` 和 `UrlHelper` 生成的 URL 会自动追加后缀。
+
+### 配置
+
+```php
+// config/config.php
+return [
+    'suffix' => '.html',   // 设置 URL 后缀
+    // ...
+];
+```
+
+### 自动生成
+
+```php
+// 路由定义
+$router->get('/post/{id}', 'PostController@show')->name('post.show');
+
+// Router::url() 生成
+Router::url('post.show', ['id' => 42]);     // → /post/42.html
+
+// UrlHelper 同样生效
+UrlHelper::route('post.show', ['id' => 42]); // → /post/42.html
+UrlHelper::action('PageController@about');   // → /about.html
+UrlHelper::to('/contact');                   // → /contact.html
+```
+
+### 排除规则
+
+以下情况**不会**追加后缀：
+
+| 场景 | URL | 结果 |
+|------|-----|------|
+| 根路径 | `/` | `/` |
+| 已有该后缀 | `/about.html` | `/about.html` |
+| 带 query string | `/search?q=test` | `/search.html?q=test` |
+| 绝对路径 | `https://example.com/page` | `https://example.com/page.html` |
+
+```php
+Router::url('home');        // → /              （根路径不追加）
+url('/about.html');         // → /about.html    （已存在不追加）
+url('/search?q=test');      // → /search.html?q=test
+url('https://ex.com/post'); // → https://ex.com/post.html
+```
+
 ## 404 处理
 
 通过 `Router::setNotFound()` 设置自定义的 404 处理器：

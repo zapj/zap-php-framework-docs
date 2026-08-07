@@ -21,9 +21,15 @@ DB::keyPair(string $table, array|string $columns, array|string $conditions = '',
 
 // 原始 SQL 执行
 DB::select(string $query, array $params = []): array
+DB::fetch(string $query, array $params = [], string|int|null $fetchModeOrModel = null): array|object|null
+DB::fetchAll(string $query, array $params = [], string|int|null $fetchModeOrModel = null): array
 DB::statement(string $query, array $params = []): \PDOStatement|false
 DB::exec(string $query, array $params = []): int
 DB::execInsert(string $query, array $params = []): false|string
+
+// fetch_model 配置
+DB::setFetchModel(?string $modelClass): void
+DB::getFetchModel(): ?string
 
 // Query Builder
 DB::table(string $table, ?string $alias = null): \zap\db\Query
@@ -160,6 +166,94 @@ while ($row = $stm->fetch()) {
     // ...
 }
 ```
+
+### fetch() — 单行查询（支持模型水合）
+
+执行 SELECT 返回单行结果。第三个参数可传入 PDO 常量或模型类名。
+
+```php
+// 返回关联数组（默认）
+$user = DB::fetch('SELECT * FROM users WHERE id = ?', [1]);
+
+// PDO 模式：取单个值
+$count = DB::fetch('SELECT COUNT(*) FROM users', [], PDO::FETCH_COLUMN);
+
+// 水合到模型
+$user = DB::fetch('SELECT * FROM users WHERE id = ?', [1], User::class);
+
+// 无结果返回 null
+$user = DB::fetch('SELECT * FROM users WHERE id = ?', [999]);
+// → null
+```
+
+**参数**
+
+| 参数 | 类型 | 说明 |
+|------|------|------|
+| `$query` | `string` | SQL 语句 |
+| `$params` | `array` | 绑定参数 |
+| `$fetchModeOrModel` | `string\|int\|null` | PDO 常量或模型类名；`null` 使用 `setFetchModel()` 设置的值 |
+
+**返回值**: `array|object|null` — 有结果返回数组/对象/模型实例，无结果返回 `null`
+
+---
+
+### fetchAll() — 多行查询（支持模型水合）
+
+执行 SELECT 返回所有行。第三个参数可传入 PDO 常量或模型类名。
+
+```php
+// 返回关联数组列表（默认）
+$users = DB::fetchAll('SELECT * FROM users WHERE status = ?', [1]);
+
+// PDO 模式：取单列值列表
+$ids = DB::fetchAll('SELECT id FROM users', [], PDO::FETCH_COLUMN);
+
+// 水合到模型列表
+$users = DB::fetchAll('SELECT * FROM users', [], User::class);
+
+// 无结果返回空数组
+$users = DB::fetchAll('SELECT * FROM users WHERE id = ?', [999]);
+// → []
+```
+
+**参数**: 同 `fetch()`
+
+**返回值**: `array` — 始终返回数组，无结果时为空数组
+
+---
+
+### setFetchModel() / getFetchModel() — 全局 fetch_model 配置
+
+设置/获取 `fetch()` 和 `fetchAll()` 的默认模型水合类。调用 `fetch()` / `fetchAll()` 时传入第三个参数可覆盖此设置。
+
+```php
+// 全局设置
+DB::setFetchModel(User::class);
+
+// 之后所有 fetch / fetchAll 自动水合到 User 模型
+$user  = DB::fetch('SELECT * FROM users WHERE id = ?', [1]);
+$users = DB::fetchAll('SELECT * FROM users WHERE status = ?', [1]);
+
+// 单次覆盖：传入 PDO 常量恢复数组模式
+$raw = DB::fetchAll('SELECT * FROM users', [], PDO::FETCH_ASSOC);
+
+// 单次覆盖：传入其他模型类
+$post = DB::fetch('SELECT * FROM posts WHERE id = ?', [1], Post::class);
+
+// 获取当前设置
+$model = DB::getFetchModel();  // → 'App\Models\User' 或 null
+
+// 清除设置
+DB::setFetchModel(null);
+```
+
+**优先级**: 参数 > `setFetchModel()` > 默认 `PDO::FETCH_ASSOC`
+
+| 方法 | 参数 | 返回值 |
+|------|------|--------|
+| `setFetchModel(?string $modelClass)` | 模型类名或 `null` | `void` |
+| `getFetchModel()` | — | `?string` |
 
 ---
 

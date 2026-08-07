@@ -40,6 +40,66 @@ DB::exec('UPDATE users SET status=? WHERE id=?', ['inactive', 5]);
 $id = DB::execInsert('INSERT INTO logs (msg) VALUES (?)', ['start']);
 ```
 
+### fetch() — 单行查询（支持模型水合）
+
+`fetch()` 执行 SELECT 并返回单行结果，无结果时返回 `null`。支持 PDO 模式常量和模型类水合。
+
+```php
+// 返回关联数组
+$user = DB::fetch('SELECT * FROM users WHERE id = ?', [1]);
+
+// 取单个值（PDO 模式）
+$count = DB::fetch('SELECT COUNT(*) FROM users', [], PDO::FETCH_COLUMN);
+
+// 水合到模型实例
+$user = DB::fetch('SELECT * FROM users WHERE id = ?', [1], User::class);
+```
+
+### fetchAll() — 多行查询（支持模型水合）
+
+`fetchAll()` 执行 SELECT 并返回所有行，无结果时返回空数组 `[]`。
+
+```php
+// 返回关联数组列表
+$users = DB::fetchAll('SELECT * FROM users WHERE status = ?', [1]);
+
+// 取单列值列表
+$ids = DB::fetchAll('SELECT id FROM users', [], PDO::FETCH_COLUMN);
+
+// 水合到模型列表
+$users = DB::fetchAll('SELECT * FROM users', [], User::class);
+```
+
+### 模型水合（fetch_model）
+
+通过 `setFetchModel()` 设置全局默认模型类，之后所有 `fetch()` / `fetchAll()` 调用自动将结果水合到模型实例中。
+
+```php
+use App\Models\User;
+
+// 方式一：全局设置，后续自动水合
+DB::setFetchModel(User::class);
+$user  = DB::fetch('SELECT * FROM users WHERE id = ?', [1]);
+$users = DB::fetchAll('SELECT * FROM users WHERE status = ?', [1]);
+
+// 方式二：单次调用时传入模型类（覆盖全局设置）
+$user = DB::fetch('SELECT * FROM users WHERE id = ?', [1], User::class);
+
+// 方式三：全局设置下仍可用 PDO 常量覆盖
+DB::setFetchModel(User::class);
+$raw = DB::fetchAll('SELECT * FROM users', [], PDO::FETCH_ASSOC);
+
+// 管理全局设置
+DB::getFetchModel();        // → 'App\Models\User' 或 null
+DB::setFetchModel(null);    // 清除全局设置
+```
+
+**优先级**：参数 > `setFetchModel()` > 默认 `PDO::FETCH_ASSOC`
+
+模型类需接受数组参数的构造函数（框架内置的 `zap\db\Model` 已支持）。
+
+---
+
 ## 查询构建器
 
 ### 基本查询
@@ -510,6 +570,56 @@ class UserController extends Controller
         return $this->json(['id' => $id], 201);
     }
 }
+```
+
+## 表前缀
+
+数据库配置中设置 `prefix` 后，框架会自动在表名前添加前缀。
+
+### 配置
+
+```php
+// config/database.php
+return [
+    'connections' => [
+        'master' => [
+            // ...
+            'prefix' => 'zap_',
+        ],
+    ],
+];
+```
+
+### 使用方式
+
+**CRUD 快捷方法** — 表名自动加前缀，直接写原始表名即可：
+
+```php
+DB::insert('users', ['name' => 'Alice']);   // → INSERT INTO `zap_users` (...)
+DB::update('users', ['status' => 1]);        // → UPDATE `zap_users` SET ...
+DB::delete('users', ['id' => 1]);            // → DELETE FROM `zap_users` WHERE ...
+DB::count('users');                          // → SELECT COUNT(*) FROM `zap_users`
+```
+
+**原始 SQL** — 用 `{表名}` 占位符，`prepare()` 自动替换：
+
+```php
+// {users} 自动替换为 `zap_users`
+DB::fetch('SELECT * FROM {users} WHERE id = ?', [1]);
+DB::fetchAll('SELECT * FROM {users} WHERE status = ?', [1], User::class);
+DB::select('SELECT * FROM {users}');
+DB::exec('DELETE FROM {users} WHERE id = ?', [99]);
+
+// 多表 JOIN 同样支持
+DB::fetchAll(
+    'SELECT u.*, p.title FROM {users} u LEFT JOIN {posts} p ON p.user_id = u.id'
+);
+```
+
+**Query Builder** — 无需特殊处理，自动带前缀：
+
+```php
+DB::table('users')->where('status', 1)->getAll();  // → `zap_users`
 ```
 
 ## 完整 CRUD 示例
