@@ -1,4 +1,4 @@
-# DB
+﻿# DB
 
 `zap\DB` 数据库门面类，提供静态方法操作数据库。封装了 CRUD 便捷方法、原始 SQL 执行、Query Builder、事务和连接管理。
 
@@ -33,6 +33,7 @@ DB::getFetchModel(): ?string
 
 // Query Builder
 DB::table(string $table, ?string $alias = null): \zap\db\Query
+DB::raw(string $value): \zap\db\Expr
 
 // 事务
 DB::beginTransaction(): void
@@ -80,7 +81,7 @@ $rows = DB::batchInsert('users', [
 DB::upsert('users', [
     'id'    => 1,
     'name'  => '更新后的名字',
-    'views' => new \zap\db\Expression('views + 1'),
+    'views' => DB::raw('views + 1'),
 ], ['name']);  // 冲突时更新 name 字段
 ```
 
@@ -274,6 +275,47 @@ $u = DB::table('users', 'u')
     ->where('u.status', 1)
     ->get();
 ```
+
+---
+
+## 原始表达式（raw()）
+
+`DB::raw()` 创建一个原始表达式对象，其值在拼接 SQL 时原样嵌入，不会被引号包裹或参数化绑定。
+
+**典型场景**: 自增计数器、使用 MySQL 函数、复杂计算表达式。
+
+```php
+// Query Builder 中使用
+DB::table('posts')
+    ->where('id', 1)
+    ->update(['hits' => DB::raw('hits + 1')]);
+
+DB::table('users')
+    ->where('created_at', '>', DB::raw('NOW() - INTERVAL 7 DAY'))
+    ->getAll();
+
+// CRUD 快捷方法中使用
+DB::update('posts', [
+    'hits'       => DB::raw('hits + 1'),
+    'updated_at' => DB::raw('NOW()'),
+], ['id' => 1]);
+
+// Insert 中使用
+DB::insert('logs', [
+    'msg'        => '系统启动',
+    'created_at' => DB::raw('NOW()'),
+]);
+```
+
+| 参数 | 类型 | 说明 |
+|------|------|------|
+| `$value` | `string` | 原始 SQL 片段 |
+
+**返回值**: `zap\db\Expr`
+
+::: warning 安全提示
+`DB::raw()` 的值不会被参数化绑定，直接拼入 SQL。**切勿**将用户输入拼入其中，否则存在 SQL 注入风险。
+:::
 
 ---
 

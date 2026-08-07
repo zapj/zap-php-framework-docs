@@ -98,6 +98,31 @@ DB::setFetchModel(null);    // 清除全局设置
 
 模型类需接受数组参数的构造函数（框架内置的 `zap\db\Model` 已支持）。
 
+### DB::raw() — 原始表达式
+
+`DB::raw()` 用原始 SQL 片段替代参数化绑定，适用于自增、MySQL 函数等场景。
+
+```php
+// Query Builder 中自增
+DB::table('posts')->where('id', 1)->update(['hits' => DB::raw('hits + 1')]);
+
+// CRUD 快捷方法中使用函数
+DB::update('posts', [
+    'hits'       => DB::raw('hits + 1'),
+    'updated_at' => DB::raw('NOW()'),
+], ['id' => 1]);
+
+DB::insert('logs', [
+    'msg'        => '启动',
+    'created_at' => DB::raw('NOW()'),
+]);
+
+// WHERE 中使用
+DB::table('users')->where('created_at', '>', DB::raw('NOW() - INTERVAL 7 DAY'))->getAll();
+```
+
+> **注意**: `DB::raw()` 不会参数化绑定，直接拼入 SQL。不要将用户输入拼入其中。
+
 ---
 
 ## 查询构建器
